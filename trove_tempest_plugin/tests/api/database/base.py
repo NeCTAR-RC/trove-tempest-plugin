@@ -16,10 +16,11 @@
 from tempest import config
 import tempest.test
 
+from trove_tempest_plugin.services.database.json import datastores_client
 from trove_tempest_plugin.services.database.json import flavors_client
+from trove_tempest_plugin.services.database.json import instances_client
 from trove_tempest_plugin.services.database.json import limits_client
 from trove_tempest_plugin.services.database.json import versions_client
-
 
 CONF = config.CONF
 
@@ -64,6 +65,18 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
             CONF.database.catalog_type,
             CONF.identity.region,
             **default_params_with_timeout_values)
+        cls.database_datastores_client =\
+            datastores_client.DatabaseDatastoresClient(
+                cls.os_primary.auth_provider,
+                CONF.database.catalog_type,
+                CONF.identity.region,
+                **default_params_with_timeout_values)
+        cls.database_instances_client =\
+            instances_client.DatabaseInstancesClient(
+                cls.os_primary.auth_provider,
+                CONF.database.catalog_type,
+                CONF.identity.region,
+                **default_params_with_timeout_values)
 
     @classmethod
     def resource_setup(cls):
@@ -72,3 +85,6 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
         cls.catalog_type = CONF.database.catalog_type
         cls.db_flavor_ref = CONF.database.db_flavor_ref
         cls.db_current_version = CONF.database.db_current_version
+        cls.datastore_type = CONF.database.datastore_type
+        cls.availability_zone = CONF.database.availability_zone
+        cls.volume_size = CONF.database.volume_size

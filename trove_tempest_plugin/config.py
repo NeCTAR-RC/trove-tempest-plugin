@@ -32,4 +32,13 @@ DatabaseGroup = [
     cfg.StrOpt('db_current_version',
                default="v1.0",
                help="Current database version to use in database tests."),
+    cfg.StrOpt('datastore_type',
+               default="MySQL",
+               help="Type of the Database"),
+    cfg.StrOpt('availability_zone',
+               default='nova',
+               help="Availability zone of the db instance to use"),
+    cfg.IntOpt('volume_size',
+               default=1,
+               help="Volume size for the db instances")
 ]
