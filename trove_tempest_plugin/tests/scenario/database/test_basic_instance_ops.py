@@ -13,6 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import dns.resolver
 from oslo_serialization import jsonutils as json
 from subprocess import PIPE
 from subprocess import Popen
@@ -55,9 +56,20 @@ class DatabaseScenarioTest(base.BaseDatabaseTest):
             }
         return post_body
 
-    def check_db_connectivity(self, instance_ip):
+    def _dns_query(self, database_hostname):
+        resolver = dns.resolver.Resolver()
+        if self.dns_name_server:
+            ns_answers = resolver.query(self.dns_name_server, "A")
+            resolver.nameservers = [answer.address for answer in ns_answers]
+        answers = resolver.query(database_hostname, "A")
+        addresses = [answer.address for answer in answers]
+        self.assertTrue(addresses)
+        return addresses[0]
+
+    def check_db_connectivity(self, database_hostname):
+        database_ip = self._dns_query(database_hostname)
         command = "mysqladmin -utempest_username -ptempest_password\
-                   -h%s ping" % instance_ip
+                   -h%s ping" % database_ip
         process = Popen(command.split(), stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate()
         print(stdout, stderr)
@@ -82,9 +94,9 @@ class DatabaseScenarioTest(base.BaseDatabaseTest):
         instances = self.client.create_db_instance(post_body)['instance']
         self.assertTrue(len(instances) > 0, "No available instances found")
         self.client.wait_for_db_instance_status(instances['id'], 'ACTIVE')
-        instance_ip = self.client.show_db_instance(
-            instances['id'])['instance']['ip']
-        self.check_db_connectivity(instance_ip[0])
+        database_hostname = self.client.show_db_instance(
+            instances['id'])['instance']['hostname']
+        self.check_db_connectivity(database_hostname)
         self.client.delete_db_instance(instances['id'])
         decommission = self.client.wait_for_db_instance_decommission(
             instances['id'])

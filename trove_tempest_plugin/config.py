@@ -40,5 +40,8 @@ DatabaseGroup = [
                help="Availability zone of the db instance to use"),
     cfg.IntOpt('volume_size',
                default=1,
-               help="Volume size for the db instances")
+               help="Volume size for the db instances"),
+    cfg.StrOpt('dns_name_server',
+               default=None,
+               help="The DNS server used to query trove instance domain name")
 ]
