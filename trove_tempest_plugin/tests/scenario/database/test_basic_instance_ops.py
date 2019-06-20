@@ -19,6 +19,8 @@ from subprocess import PIPE
 from subprocess import Popen
 from tempest.lib import decorators
 from testtools import testcase as testtools
+
+from trove_tempest_plugin.common import waiters
 from trove_tempest_plugin.tests.api.database import base
 
 
@@ -93,11 +95,12 @@ class DatabaseScenarioTest(base.BaseDatabaseTest):
         post_body = json.dumps(self.db_instance())
         instances = self.client.create_db_instance(post_body)['instance']
         self.assertTrue(len(instances) > 0, "No available instances found")
-        self.client.wait_for_db_instance_status(instances['id'], 'ACTIVE')
+        waiters.wait_for_db_instance_status(self.client, instances['id'],
+                                            'ACTIVE')
         database_hostname = self.client.show_db_instance(
             instances['id'])['instance']['hostname']
         self.check_db_connectivity(database_hostname)
         self.client.delete_db_instance(instances['id'])
-        decommission = self.client.wait_for_db_instance_decommission(
-            instances['id'])
+        decommission = waiters.wait_for_db_instance_decommission(
+            self.client, instances['id'])
         self.assertFalse(decommission, "DB instance deletion failed!")

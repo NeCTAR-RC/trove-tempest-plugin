@@ -13,9 +13,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import json
+
 from tempest import config
+from tempest.lib.common.utils import data_utils
+from tempest.lib.common.utils import test_utils
 import tempest.test
 
+from trove_tempest_plugin.common import waiters
 from trove_tempest_plugin.services.database.json import datastores_client
 from trove_tempest_plugin.services.database.json import flavors_client
 from trove_tempest_plugin.services.database.json import instances_client
@@ -89,3 +94,53 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
         cls.availability_zone = CONF.database.availability_zone
         cls.volume_size = CONF.database.volume_size
         cls.dns_name_server = CONF.database.dns_name_server
+
+    @classmethod
+    def create_test_instance(cls):
+        """Wrapper utility that returns a test serinstancever.
+
+        This wrapper utility calls the common create test instance and
+        returns a test instance. The purpose of this wrapper is to minimize
+        the impact on the code of the tests already using this
+        function.
+
+        :param validatable: Whether the server will connectable via db protocol
+        :param validation_resources: Dictionary of validation resources as
+            returned by `get_class_validation_resources`.
+        :param kwargs: Extra arguments are passed down to the
+            `create_test_instance` call.
+        """
+        name = data_utils.rand_name(cls.__name__ + "-instance")
+
+        post_body = json.dumps({
+            "instance": {
+                "users": [],
+                "availability_zone": CONF.database.availability_zone,
+                "flavorRef": CONF.database.db_flavor_ref,
+                "volume": {
+                    "size": CONF.database.volume_size
+                },
+                "databases": [],
+                "datastore": {
+                    "type": CONF.database.datastore_type
+                },
+                "name": name
+                }
+            })
+
+        instance = cls.client.create_db_instance(post_body)['instance']
+
+        waiters.wait_for_db_instance_status(cls.client, instance['id'],
+                                            'ACTIVE')
+
+        # For each instance schedule wait and delete, so we first delete all
+        # and then wait for all
+        cls.addClassResourceCleanup(
+            waiters.wait_for_db_instance_decommission,
+            cls.database_instances_client, instance['id'])
+
+        cls.addClassResourceCleanup(
+            test_utils.call_and_ignore_notfound_exc,
+            cls.database_instances_client.delete_db_instance, instance['id'])
+
+        return instance
