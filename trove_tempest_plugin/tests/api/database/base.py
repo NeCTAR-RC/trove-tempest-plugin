@@ -21,6 +21,7 @@ from tempest.lib.common.utils import test_utils
 import tempest.test
 
 from trove_tempest_plugin.common import waiters
+from trove_tempest_plugin.services.database.json import backups_client
 from trove_tempest_plugin.services.database.json import datastores_client
 from trove_tempest_plugin.services.database.json import flavors_client
 from trove_tempest_plugin.services.database.json import instances_client
@@ -82,6 +83,12 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
                 CONF.database.catalog_type,
                 CONF.identity.region,
                 **default_params_with_timeout_values)
+        cls.database_backups_client =\
+            backups_client.DatabaseBackupsClient(
+                cls.os_primary.auth_provider,
+                CONF.database.catalog_type,
+                CONF.identity.region,
+                **default_params_with_timeout_values)
 
     @classmethod
     def resource_setup(cls):
@@ -96,7 +103,7 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
         cls.dns_name_server = CONF.database.dns_name_server
 
     @classmethod
-    def create_test_instance(cls):
+    def create_test_instance(cls, backup_id=None):
         """Wrapper utility that returns a test serinstancever.
 
         This wrapper utility calls the common create test instance and
@@ -111,23 +118,19 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
             `create_test_instance` call.
         """
         name = data_utils.rand_name(cls.__name__ + "-instance")
+        instance_dict = {
+            "users": [],
+            "availability_zone": CONF.database.availability_zone,
+            "flavorRef": CONF.database.db_flavor_ref,
+            "volume": {"size": CONF.database.volume_size},
+            "databases": [],
+            "datastore": {"type": CONF.database.datastore_type},
+            "name": name
+        }
+        if backup_id:
+            instance_dict["restorePoint"] = {"backupRef": backup_id}
 
-        post_body = json.dumps({
-            "instance": {
-                "users": [],
-                "availability_zone": CONF.database.availability_zone,
-                "flavorRef": CONF.database.db_flavor_ref,
-                "volume": {
-                    "size": CONF.database.volume_size
-                },
-                "databases": [],
-                "datastore": {
-                    "type": CONF.database.datastore_type
-                },
-                "name": name
-                }
-            })
-
+        post_body = json.dumps({'instance': instance_dict})
         instance = cls.client.create_db_instance(post_body)['instance']
 
         waiters.wait_for_db_instance_status(cls.client, instance['id'],

@@ -95,3 +95,8 @@ class InstanceActionsTest(base.WithInstanceBaseTest):
         access = self.client.show_user_access(self.instance_id, user)
         access = [x['name'] for x in access['databases']]
         self.assertNotIn(db, access)
+
+    @decorators.idempotent_id('b13ff6fb-6214-416b-8aea-23dc3c24d00e')
+    def test_list_backups(self):
+        backups = self.client.list_backups(self.instance_id)
+        self.assertEqual([], backups['backups'])

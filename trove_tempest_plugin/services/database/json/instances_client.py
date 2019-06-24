@@ -202,3 +202,10 @@ class DatabaseInstancesClient(rest_client.RestClient):
         self.expected_success(200, resp.status)
         body = json.loads(body)
         return rest_client.ResponseBody(resp, body)
+
+    def list_backups(self, instance_id):
+        """List all backups on an instance."""
+        resp, body = self.get('instances/%s/backups' % instance_id)
+        self.expected_success(200, resp.status)
+        body = json.loads(body)
+        return rest_client.ResponseBody(resp, body)
