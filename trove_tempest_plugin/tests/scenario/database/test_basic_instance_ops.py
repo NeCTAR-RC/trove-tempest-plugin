@@ -56,6 +56,10 @@ class DatabaseScenarioTest(base.BaseDatabaseTest):
                 "name": "tempest-trove-inst"
                 }
             }
+        if self.datastore_version:
+            post_body["instance"]["datastore"]["version"] = \
+                self.datastore_version
+
         return post_body
 
     def _dns_query(self, database_hostname):
