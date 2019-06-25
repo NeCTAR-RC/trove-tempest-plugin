@@ -98,6 +98,7 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
         cls.db_flavor_ref = CONF.database.db_flavor_ref
         cls.db_current_version = CONF.database.db_current_version
         cls.datastore_type = CONF.database.datastore_type
+        cls.datastore_version = CONF.database.datastore_version
         cls.availability_zone = CONF.database.availability_zone
         cls.volume_size = CONF.database.volume_size
         cls.dns_name_server = CONF.database.dns_name_server
