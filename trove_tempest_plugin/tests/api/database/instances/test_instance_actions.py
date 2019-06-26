@@ -13,9 +13,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from tempest.lib.common.utils import data_utils
 from tempest.lib import decorators
 
+from trove_tempest_plugin.common import utils
 from trove_tempest_plugin.common import waiters
 from trove_tempest_plugin.tests.api.database.instances import base
 
@@ -41,7 +41,7 @@ class InstanceActionsTest(base.WithInstanceBaseTest):
 
     @decorators.idempotent_id('38b5462a-308e-4cb8-9530-cc6741c95501')
     def test_list_create_delete_database(self):
-        name = data_utils.rand_name()
+        name = utils.rand_name()
         self.client.create_database(self.instance_id, name=name)
         databases = self.client.list_databases(self.instance_id)['databases']
         databases = [x['name'] for x in databases]
@@ -68,7 +68,7 @@ class InstanceActionsTest(base.WithInstanceBaseTest):
 
     @decorators.idempotent_id('9f11d15b-9640-4c33-a7db-c78224763014')
     def test_list_create_delete_user(self):
-        name = data_utils.rand_name()[:16]
+        name = utils.rand_name()
         self.client.create_user(self.instance_id, name=name, password='secret')
         users = self.client.list_users(self.instance_id)['users']
         users = [x['name'] for x in users]
@@ -80,9 +80,8 @@ class InstanceActionsTest(base.WithInstanceBaseTest):
 
     @decorators.idempotent_id('6f8b8350-f2a9-47b2-a108-8e3653cb9b57')
     def test_grant_revoke_list_access(self):
-        # PostgreSQL has an issue granting to user with a -
-        user = data_utils.rand_name()[:16].replace('-', '_')
-        db = data_utils.rand_name()
+        user = utils.rand_name()
+        db = utils.rand_name()
         self.client.create_user(self.instance_id, name=user, password='secret')
         self.client.create_database(self.instance_id, name=db)
         access = self.client.show_user_access(self.instance_id, user)

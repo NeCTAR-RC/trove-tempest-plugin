@@ -13,10 +13,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from tempest.lib.common.utils import data_utils
 from tempest.lib.common.utils import test_utils
 from tempest.lib import decorators
 
+from trove_tempest_plugin.common import utils
 from trove_tempest_plugin.common import waiters
 from trove_tempest_plugin.tests.api.database.instances import base
 
@@ -39,7 +39,7 @@ class InstanceBackupsTest(base.WithInstanceBaseTest):
 
     @decorators.idempotent_id('e4c2bf6d-e619-4d9b-a79b-67f5463a8705')
     def test_list_create_delete_backup(self):
-        name = data_utils.rand_name()
+        name = utils.rand_name()
         backup = self.backup_client.create_backup(self.instance_id, name)
         backup_id = backup['backup']['id']
         waiters.wait_for_backup_status(self.backup_client, backup_id,
@@ -57,7 +57,7 @@ class InstanceBackupsTest(base.WithInstanceBaseTest):
 
     @decorators.idempotent_id('2ddab860-b487-481f-b89e-9ad06d5f6286')
     def test_backup_incremental(self):
-        name = data_utils.rand_name()
+        name = utils.rand_name()
         backup = self.backup_client.create_backup(self.instance_id, name)
         parent_id = backup['backup']['id']
         self._add_cleanup(parent_id)

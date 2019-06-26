@@ -13,10 +13,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from tempest.lib.common.utils import data_utils
 from tempest.lib.common.utils import test_utils
 from tempest.lib import decorators
 
+from trove_tempest_plugin.common import utils
 from trove_tempest_plugin.common import waiters
 from trove_tempest_plugin.tests.api.database.instances import base
 
@@ -31,9 +31,9 @@ class BackupRestoreScenarioTest(base.WithInstanceBaseTest):
     @decorators.idempotent_id('aec0a59a-1f94-4235-ba8c-5bb2b210bc49')
     def test_restore_from_backup(self):
         # Create a user and a DB as verification restore works
-        db_name = data_utils.rand_name()[:16]
-        user_name = data_utils.rand_name()[:16]
-        user_password = data_utils.rand_name()[:16]
+        db_name = utils.rand_name()
+        user_name = utils.rand_name()
+        user_password = utils.rand_name()
         self.client.create_database(self.instance_id, name=db_name)
         self.client.create_user(self.instance_id, name=user_name,
                                 password=user_password)
@@ -43,7 +43,7 @@ class BackupRestoreScenarioTest(base.WithInstanceBaseTest):
         users = self.client.list_users(self.instance_id)['users']
 
         # Create backup
-        backup_name = data_utils.rand_name()
+        backup_name = utils.db_rand_name()
         backup = self.backup_client.create_backup(self.instance_id,
                                                   backup_name)
         backup_id = backup['backup']['id']
@@ -71,16 +71,16 @@ class BackupRestoreScenarioTest(base.WithInstanceBaseTest):
     @decorators.idempotent_id('ae37347c-9dac-4b4d-bf95-cb64722094dc')
     def test_restore_from_incremental_backup(self):
         # Create a user and a DB as verification restore works
-        db_name = data_utils.rand_name()[:16]
-        user_name = data_utils.rand_name()[:16]
-        user_password = data_utils.rand_name()[:16]
+        db_name = utils.rand_name()
+        user_name = utils.rand_name()
+        user_password = utils.rand_name()
         self.client.create_database(self.instance_id, name=db_name)
         self.client.create_user(self.instance_id, name=user_name,
                                 password=user_password)
         self.client.grant_user_access(self.instance_id, user_name, [db_name])
 
         # Create backup
-        backup_name = data_utils.rand_name()
+        backup_name = utils.rand_name()
         backup = self.backup_client.create_backup(self.instance_id,
                                                   backup_name)
         backup_id = backup['backup']['id']
@@ -94,9 +94,9 @@ class BackupRestoreScenarioTest(base.WithInstanceBaseTest):
                                      backup_id)
 
         # Create another user and a DB as verification for incremental works
-        db_name = data_utils.rand_name()[:16]
-        user_name = data_utils.rand_name()[:16]
-        user_password = data_utils.rand_name()[:16]
+        db_name = utils.rand_name()
+        user_name = utils.rand_name()
+        user_password = utils.rand_name()
         self.client.create_database(self.instance_id, name=db_name)
         self.client.create_user(self.instance_id, name=user_name,
                                 password=user_password)
@@ -106,7 +106,7 @@ class BackupRestoreScenarioTest(base.WithInstanceBaseTest):
         users = self.client.list_users(self.instance_id)['users']
 
         # Create incremental backup
-        backup_name = data_utils.rand_name()
+        backup_name = utils.rand_name()
         backup = self.backup_client.create_backup(
             self.instance_id, backup_name, parent=backup_id, incremental=True)
         backup_id = backup['backup']['id']
