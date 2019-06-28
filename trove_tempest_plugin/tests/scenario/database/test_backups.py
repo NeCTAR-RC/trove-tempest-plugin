@@ -43,7 +43,7 @@ class BackupRestoreScenarioTest(base.WithInstanceBaseTest):
         users = self.client.list_users(self.instance_id)['users']
 
         # Create backup
-        backup_name = utils.db_rand_name()
+        backup_name = utils.rand_name()
         backup = self.backup_client.create_backup(self.instance_id,
                                                   backup_name)
         backup_id = backup['backup']['id']
