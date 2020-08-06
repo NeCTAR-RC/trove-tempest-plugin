@@ -137,9 +137,6 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
         post_body = json.dumps({'instance': instance_dict})
         instance = cls.client.create_db_instance(post_body)['instance']
 
-        waiters.wait_for_db_instance_status(cls.client, instance['id'],
-                                            'ACTIVE')
-
         # For each instance schedule wait and delete, so we first delete all
         # and then wait for all
         cls.addClassResourceCleanup(
@@ -149,5 +146,8 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
         cls.addClassResourceCleanup(
             test_utils.call_and_ignore_notfound_exc,
             cls.database_instances_client.delete_db_instance, instance['id'])
+
+        waiters.wait_for_db_instance_status(cls.client, instance['id'],
+                                            'ACTIVE')
 
         return instance
