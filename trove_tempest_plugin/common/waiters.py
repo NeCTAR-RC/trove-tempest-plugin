@@ -20,7 +20,7 @@ from tempest.lib import exceptions as lib_exc
 
 
 def wait_for_db_instance_status(client, instance_id, status,
-                                failure_pattern='^.*_ERROR$'):
+                                failure_pattern='ERROR'):
     """Wait for a db instance to reach a given status"""
     start = int(time.time())
     fail_regexp = re.compile(failure_pattern)
@@ -36,7 +36,7 @@ def wait_for_db_instance_status(client, instance_id, status,
         if instance_status == status:
             return body
         if fail_regexp.search(instance_status):
-            raise KeyError
+            raise KeyError("Instance in ERROR state")
         if int(time.time()) - start >= client.build_timeout:
             message = ('DB Instance %s failed to reach %s status'
                        '(current: %s) within the required time (%s s).' %
@@ -65,7 +65,7 @@ def wait_for_db_instance_decommission(client, instance_id):
 
 
 def wait_for_backup_status(client, backup_id, status,
-                           failure_pattern='^.*_ERROR$'):
+                           failure_pattern='FAILED'):
     """Wait for a backup to reach a given status"""
     start = int(time.time())
     fail_regexp = re.compile(failure_pattern)
@@ -81,7 +81,7 @@ def wait_for_backup_status(client, backup_id, status,
         if backup_status == status:
             return body
         if fail_regexp.search(backup_status):
-            raise KeyError
+            raise KeyError("Backup in FAILED state")
         if int(time.time()) - start >= client.build_timeout:
             message = ('Backup %s failed to reach %s status'
                        '(current: %s) within the required time (%s s).' %
