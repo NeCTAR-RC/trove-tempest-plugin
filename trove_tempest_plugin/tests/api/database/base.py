@@ -104,7 +104,7 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
         cls.dns_name_server = CONF.database.dns_name_server
 
     @classmethod
-    def create_test_instance(cls, backup_id=None):
+    def create_test_instance(cls, backup_id=None, datastore_version=None):
         """Wrapper utility that returns a test serinstancever.
 
         This wrapper utility calls the common create test instance and
@@ -128,7 +128,9 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
             "datastore": {"type": CONF.database.datastore_type},
             "name": name
         }
-        if CONF.database.datastore_version:
+        if CONF.database.datastore_version and not datastore_version:
+            datastore_version = CONF.database.datastore_version
+        if datastore_version:
             instance_dict["datastore"]["version"] = \
                 CONF.database.datastore_version
         if backup_id:

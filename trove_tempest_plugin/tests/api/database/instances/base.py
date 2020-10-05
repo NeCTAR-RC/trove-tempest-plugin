@@ -39,7 +39,8 @@ class WithInstanceBaseTest(base.BaseDatabaseTest):
         cls.client = cls.database_instances_client
 
     @classmethod
-    def resource_setup(cls):
+    def resource_setup(cls, datastore_version=None):
         super(WithInstanceBaseTest, cls).resource_setup()
-        instance = cls.create_test_instance()
+        instance = cls.create_test_instance(
+            datastore_version=datastore_version)
         cls.instance_id = instance['id']

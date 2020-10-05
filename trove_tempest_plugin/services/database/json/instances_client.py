@@ -70,6 +70,16 @@ class DatabaseInstancesClient(rest_client.RestClient):
         """Restart the db instance"""
         return self.action(instance_id, "restart")
 
+    def upgrade_db_instance(self, instance_id, datastore_version):
+        body = json.dumps({"instance": {
+            "datastore_version": datastore_version}})
+        resp, body = self.patch('instances/%s' % instance_id,
+                                body)
+        self.expected_success(202, resp.status)
+        if body:
+            body = json.loads(body)
+        return rest_client.ResponseBody(resp, body)
+
     def delete_db_instance(self, instance_id):
         """Delete the db instance"""
         url = 'instances/%s' % instance_id
