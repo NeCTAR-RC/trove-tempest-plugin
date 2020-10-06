@@ -45,6 +45,8 @@ class UpgradeInstanceScenarioTest(base.WithInstanceBaseTest):
         self.client.grant_user_access(self.instance_id, user_name, [db_name])
 
         databases = self.client.list_databases(self.instance_id)['databases']
+        databases = [i['name'] for i in databases if i['name'] != 'sys']
+
         users = self.client.list_users(self.instance_id)['users']
 
         self.client.upgrade_db_instance(self.instance_id,
@@ -54,6 +56,8 @@ class UpgradeInstanceScenarioTest(base.WithInstanceBaseTest):
 
         databases_upgrade = self.client.list_databases(
             self.instance_id)['databases']
+        databases_upgrade = [i['name'] for i in databases_upgrade
+                             if i['name'] != 'sys']
         users_upgrade = self.client.list_users(self.instance_id)['users']
 
         # Ensure users and databases match

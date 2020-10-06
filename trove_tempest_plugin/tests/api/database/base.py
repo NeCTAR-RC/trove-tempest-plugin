@@ -131,8 +131,7 @@ class BaseDatabaseTest(tempest.test.BaseTestCase):
         if CONF.database.datastore_version and not datastore_version:
             datastore_version = CONF.database.datastore_version
         if datastore_version:
-            instance_dict["datastore"]["version"] = \
-                CONF.database.datastore_version
+            instance_dict["datastore"]["version"] = datastore_version
         if backup_id:
             instance_dict["restorePoint"] = {"backupRef": backup_id}
 
