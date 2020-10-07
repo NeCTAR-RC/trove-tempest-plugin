@@ -13,6 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import time
+
 from oslo_serialization import jsonutils as json
 from six.moves.urllib import parse as urllib
 from tempest.lib.common import rest_client
@@ -102,6 +104,7 @@ class DatabaseInstancesClient(rest_client.RestClient):
         self.expected_success(202, resp.status)
         if body:
             body = json.loads(body)
+        time.sleep(2)
         return rest_client.ResponseBody(resp, body)
 
     def delete_database(self, instance_id, name):
@@ -111,6 +114,7 @@ class DatabaseInstancesClient(rest_client.RestClient):
         self.expected_success(202, resp.status)
         if body:
             body = json.loads(body)
+        time.sleep(2)
         return rest_client.ResponseBody(resp, body)
 
     def root_show(self, instance_id):
@@ -163,6 +167,7 @@ class DatabaseInstancesClient(rest_client.RestClient):
         self.expected_success(202, resp.status)
         if body:
             body = json.loads(body)
+        time.sleep(2)
         return rest_client.ResponseBody(resp, body)
 
     def update_user(self, instance_id, name, **kwargs):
@@ -173,6 +178,7 @@ class DatabaseInstancesClient(rest_client.RestClient):
         self.expected_success(202, resp.status)
         if body:
             body = json.loads(body)
+        time.sleep(2)
         return rest_client.ResponseBody(resp, body)
 
     def delete_user(self, instance_id, name):
@@ -182,6 +188,7 @@ class DatabaseInstancesClient(rest_client.RestClient):
         self.expected_success(202, resp.status)
         if body:
             body = json.loads(body)
+        time.sleep(2)
         return rest_client.ResponseBody(resp, body)
 
     def grant_user_access(self, instance_id, name, databases):
