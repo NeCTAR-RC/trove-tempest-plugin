@@ -23,6 +23,8 @@ from trove_tempest_plugin.tests.api.database.instances import base
 CONF = config.CONF
 
 
+@testtools.skipUnless(CONF.database.previous_datastore_version,
+                      'The previous_datastore_version must be specified.')
 class UpgradeInstanceScenarioTest(base.WithInstanceBaseTest):
 
     @classmethod
@@ -31,8 +33,6 @@ class UpgradeInstanceScenarioTest(base.WithInstanceBaseTest):
             datastore_version=CONF.database.previous_datastore_version)
         cls.client = cls.database_instances_client
 
-    @testtools.skipUnless(CONF.database.previous_datastore_version,
-                          'The previous_datastore_version must be specified.')
     @decorators.idempotent_id('7950255c-ddcb-4af0-936f-523e0ee31041')
     def test_upgrade_instance(self):
         # Create a user and a DB as verification restore works
