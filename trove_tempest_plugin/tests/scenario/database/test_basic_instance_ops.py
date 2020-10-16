@@ -80,8 +80,7 @@ class DatabaseScenarioTest(base.BaseDatabaseTest):
         stdout, stderr = process.communicate()
         print(stdout, stderr)
         if process.returncode:
-            raise Exception.message("DB connectivity check failed with %s"
-                                    % stderr)
+            raise Exception("DB connectivity check failed with %s" % stderr)
 
     @classmethod
     def resource_setup(cls):
