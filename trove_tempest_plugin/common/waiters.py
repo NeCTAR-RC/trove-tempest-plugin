@@ -24,16 +24,19 @@ def wait_for_db_instance_status(client, instance_id, status,
     """Wait for a db instance to reach a given status"""
     start = int(time.time())
     fail_regexp = re.compile(failure_pattern)
-
+    if status == 'ACTIVE':
+        status = ['ACTIVE', 'HEALTHY']
+    else:
+        status = [status]
     while True:
         try:
             body = client.show_db_instance(instance_id)['instance']
         except lib_exc.NotFound:
-            if status == 'DELETE_COMPLETE':
+            if status == ['DELETE_COMPLETE']:
                 return
         instance_name = body['name']
         instance_status = body['status']
-        if instance_status == status:
+        if instance_status in status:
             return body
         if fail_regexp.search(instance_status):
             raise KeyError("Instance in ERROR state")
